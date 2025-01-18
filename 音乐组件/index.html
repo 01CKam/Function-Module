@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>这是一个音乐组件</title>
+      <!-- Music -->
+  <link rel="stylesheet" href="./musicAPI/APlayer.min.css">
+  <script src="./musicAPI/APlayer.min.js"></script>
+  <script src="./musicAPI/Meting.min.js"></script>
+</head>
+<body>
+    <!-- 网易云播放器 左下角显示-->
+    <meting-js server="netease" 
+    type="playlist" 
+    id="12318167109" 
+    fixed="true" 
+    mini="true" 
+    order="random" 
+    loop="all"
+    preload="auto" 
+    list-folded="false" 
+    autoplay="true" 
+    volume="1"
+    storageName='aplayer-setting'
+    >
+    </meting-js>
+
+</body>
+</html>
