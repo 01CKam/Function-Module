@@ -7,8 +7,10 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.example.alipay.config.AlipayConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,17 +26,30 @@ public class AlipayController {
     @Autowired
     private AlipayConfig alipayConfig;
 
-    @GetMapping("/pay")
-    public void pay(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @GetMapping("/")
+    public String index(Model model) {
+        return "index"; // 返回index.html视图
+    }
+
+    @GetMapping("/order")
+    public String orderForm(Model model) {
+        return "order_form"; // 返回order_form.html视图
+    }
+
+    @PostMapping("/pay")
+    public void pay(@RequestParam("out_trade_no") String outTradeNo,
+                    @RequestParam("total_amount") String totalAmount,
+                    @RequestParam("subject") String subject,
+                    HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 创建API对应的request类
         AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
         alipayRequest.setReturnUrl(alipayConfig.getReturnUrl());
         alipayRequest.setNotifyUrl(alipayConfig.getNotifyUrl());
 
         // 填充业务参数
-        alipayRequest.setBizContent("{\"out_trade_no\":\"" + System.currentTimeMillis() + "\"," +
-                "\"total_amount\":\"0.01\"," +
-                "\"subject\":\"测试商品\"," +
+        alipayRequest.setBizContent("{\"out_trade_no\":\"" + outTradeNo + "\"," +
+                "\"total_amount\":\"" + totalAmount + "\"," +
+                "\"subject\":\"" + subject + "\"," +
                 "\"body\":\"这是一个测试商品的描述\"," +
                 "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
 
@@ -61,9 +76,8 @@ public class AlipayController {
         }
     }
 
-    @PostMapping("/return_url")
-    @ResponseBody
-    public String returnUrl(HttpServletRequest request) {
+    @GetMapping("/return_url")
+    public String returnUrl(HttpServletRequest request, Model model) {
         // 获取支付宝GET过来反馈信息
         Map<String, String[]> parameterMap = request.getParameterMap();
         Map<String, String> params = new HashMap<>(parameterMap.size());
@@ -88,11 +102,13 @@ public class AlipayController {
 
         if (signVerified) {
             // 验证成功
-            return "success";
+            model.addAttribute("message", "支付成功！");
         } else {
             // 验证失败
-            return "failure";
+            model.addAttribute("message", "支付失败！");
         }
+
+        return "return_url";
     }
 
     @PostMapping("/notify_url")
@@ -129,3 +145,6 @@ public class AlipayController {
         }
     }
 }
+
+
+
